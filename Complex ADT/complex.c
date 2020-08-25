@@ -22,7 +22,7 @@ complex_type complex(float r, float i)
 // Function to print a complex number
 void print_complex(complex_type B)
 {
-    printf("%0.3f + %0.3fi", B.real, B.imaginary);
+    printf("(%0.3f) + (%0.3f)i", B.real, B.imaginary);
 }
 
 // Function to add two complex numbers A and B
