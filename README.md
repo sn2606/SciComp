@@ -13,7 +13,7 @@ William T. Vellerling,
 Brian P. Flannery, 
 
 
-Guidelines -
+## Guidelines :
 
 Complex ADT, Vector ADT, Matrix ADT - some utility functions put together
 
