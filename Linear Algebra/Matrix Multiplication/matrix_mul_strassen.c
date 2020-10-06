@@ -1,3 +1,7 @@
+// This code has bad computation time. 
+// Refer multiplication_int.c for better code
+
+
 # include <stdio.h>
 # include <math.h>
 # include <stdlib.h>

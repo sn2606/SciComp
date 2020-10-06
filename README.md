@@ -31,3 +31,6 @@ Results - CSV files and jupyter notebook containing the results of testing
 
 
 Linear Algebra - Has methods like crout's, doolittle's algorithm, strassen's algorithm, Gauss Jordan method
+
+
+Statistics - Has correlation, moments of distribution so far

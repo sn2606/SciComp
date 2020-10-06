@@ -1,121 +1,337 @@
-// C Program to implement Strassen's algorithm for matrix multiplication
-// Divide and Conquer algorithm design paradigm
-
 # include <stdio.h>
-# include <stdlib.h>
 # include <math.h>
+# include <stdlib.h>
 # include "utility.h"
-# define MAX 32
+# define MAX_SIZE 32
 
-float **initial_matrix(float **a, int *dima);
-float **add(float **a, float **b, int size, float **c);
-float **sub(float **a, float **b, int size, float **c);
-void multiply(float **c, float **d, int size, int size2, float **new);
-void print_matrix(float **c, int *dimC);
+void add_matrices(int **a, int **b, int size,int **c);
+void subtract_matrices(int **a, int **b, int size,int **c);
 
-// Main function
-int main()
+void  multiply(int **c, int **d, int size, int size2, int **new)
 {
-    float **a = NULL, **b = NULL, **c;
-    int *dima = ivector(2);
-    int *dimb = ivector(2);
-    int *dimc = ivector(2);
-    int n, status, p, k;
-
-    printf("Enter size of the matrices (n) : ");
-    status = scanf("%d", &n);
-    fflush(stdin);
-
-    p = log2(n);
-    k = pow(2, p);
-
-    while (status == 0 || n != k)
+    // if(size == 1)
+    // {   
+    //     new[0][0] = c[0][0] *d[0][0];   
+    // }
+    // Added cutoff point
+    if(size == 512)
     {
-        printf("Enter valid size : ");
-        status = scanf("%d", &n);
-        fflush(stdin);
-        p = log2(n);
-        k = pow(2, p);
+        int dimA[] = {512, 512};
+        int dimB[] = {512, 512};
+
+        matrix_multiplication_co_int(c, d, dimA, dimB);
     }
-
-    dima[0] = n; dima[1] = n;
-    dimb[0] = n; dimb[1] = n;
-    dimc[0] = n; dimc[1] = n;  
-
-    c = fmatrix(n, n);
-
-    printf("\n------- MATRIX A (n x n) -------\n\n");
-    a = initial_matrix(a, dima);
-
-    printf("\n------- MATRIX B (n x n) -------\n\n");    
-    b = initial_matrix(b, dimb);
-
-    multiply(a, b, n, n, c);
-    print_matrix(c, dimc);
-    
-    return 0;
-}
-
-// Function to initialize the matrices
-float **initial_matrix(float **a, int *dima)
-{
-    int i, j, m1, n1, status, flag;
-
-    m1 = dima[0];
-    n1 = dima[1];
-
-    a = fmatrix(m1, n1);
-
-    // Taking input for matrix A + validation
-    do {
-
-    for(i = 0; i < m1; i++)
+    else 
     {
-        printf("Enter row %d: ", i+1);
-        flag = 1;
+        int i,j;
+        int nsize =size/2;
 
-        for(j = 0; j < n1; j++)
+        int **c11 = malloc(nsize * sizeof(int *));
+        int **c12 = malloc(nsize * sizeof(int *));
+        int **c21 = malloc(nsize * sizeof(int *));
+        int **c22 = malloc(nsize * sizeof(int *));
+        int **d11 = malloc(nsize * sizeof(int *));
+        int **d12 = malloc(nsize * sizeof(int *));
+        int **d21 = malloc(nsize * sizeof(int *));
+        int **d22 = malloc(nsize * sizeof(int *));
+        int **m1 = malloc(nsize * sizeof(int *));
+        int **m2 = malloc(nsize * sizeof(int *));
+        int **m3 = malloc(nsize * sizeof(int *));
+        int **m4 = malloc(nsize * sizeof(int *));
+        int **m5 = malloc(nsize * sizeof(int *));
+        int **m6 = malloc(nsize * sizeof(int *));
+        int **m7 = malloc(nsize * sizeof(int *));
+        int **temp1 = malloc(nsize * sizeof(int *));
+        int **temp2 = malloc(nsize * sizeof(int *));
+        int **temp3 = malloc(nsize * sizeof(int *));
+        int **temp4 = malloc(nsize * sizeof(int *));
+        int **temp5 = malloc(nsize * sizeof(int *));
+        int **temp6 = malloc(nsize * sizeof(int *));
+        int **temp7 = malloc(nsize * sizeof(int *));
+        int **temp8 = malloc(nsize * sizeof(int *));
+        int **temp9 = malloc(nsize * sizeof(int *));
+        int **temp10 = malloc(nsize * sizeof(int *));
+        int **t1 = malloc(nsize * sizeof(int *));
+        int **t2 = malloc(nsize * sizeof(int *));
+        int **t3 = malloc(nsize * sizeof(int *));
+        int **t4 = malloc(nsize * sizeof(int *));
+        int **t5 = malloc(nsize * sizeof(int *));
+        int **t6 = malloc(nsize * sizeof(int *));
+        int **t7 = malloc(nsize * sizeof(int *));
+        int **t8 = malloc(nsize * sizeof(int *));
+
+        for(i = 0; i < nsize; i++)
         {
-            status = scanf("%f", (*(a + i)) + j);
-            if(status == 0)
+            c11[i] = malloc(nsize * sizeof(int));
+            c12[i] = malloc(nsize * sizeof(int));
+            c21[i] = malloc(nsize * sizeof(int));
+            c22[i] = malloc(nsize * sizeof(int));
+            d11[i] = malloc(nsize * sizeof(int));
+            d12[i] = malloc(nsize * sizeof(int));
+            d21[i] = malloc(nsize * sizeof(int));
+            d22[i] = malloc(nsize * sizeof(int));
+            m1[i]  = malloc(nsize * sizeof(int));
+            m2[i]  = malloc(nsize * sizeof(int));
+            m3[i]  = malloc(nsize * sizeof(int));
+            m4[i]  = malloc(nsize * sizeof(int));
+            m5[i]  = malloc(nsize * sizeof(int));
+            m6[i]  = malloc(nsize * sizeof(int));
+            m7[i]  = malloc(nsize * sizeof(int));
+            temp1[i] = malloc(nsize * sizeof(int));
+            temp2[i] = malloc(nsize * sizeof(int));
+            temp3[i] = malloc(nsize * sizeof(int));
+            temp4[i] = malloc(nsize * sizeof(int));
+            temp5[i] = malloc(nsize * sizeof(int));
+            temp6[i] = malloc(nsize * sizeof(int));
+            temp7[i] = malloc(nsize * sizeof(int));
+            temp8[i] = malloc(nsize * sizeof(int));
+            temp9[i] = malloc(nsize * sizeof(int));
+            temp10[i] = malloc(nsize * sizeof(int));
+            t1[i] = malloc(nsize * sizeof(int));
+            t2[i] = malloc(nsize * sizeof(int));
+            t3[i] = malloc(nsize * sizeof(int));
+            t4[i] = malloc(nsize * sizeof(int));
+            t5[i] = malloc(nsize * sizeof(int));
+            t6[i] = malloc(nsize * sizeof(int));
+            t7[i] = malloc(nsize * sizeof(int));
+            t8[i] = malloc(nsize * sizeof(int));
+           
+        }
+
+        for(i = 0; i < nsize; i++)
+        {
+            for(j = 0; j < nsize; j++) 
             {
-                flag = 0;
-                break;
+                c11[i][j]=c[i][j];
+                c12[i][j]=c[i][j+nsize];
+                c21[i][j]=c[i+nsize][j];
+                c22[i][j]=c[i+nsize][j+nsize]; 
+                                  
+                d11[i][j]=d[i][j];
+                d12[i][j]=d[i][j+nsize];
+                d21[i][j]=d[i+nsize][j];
+                d22[i][j]=d[i+nsize][j+nsize];
             }
         }
-        if(flag == 0)
+
+       
+        add_matrices(c11,c22,nsize,temp1);
+        add_matrices(d11,d22,nsize,temp2);
+        multiply(temp1,temp2,nsize,size,m1);
+
+        add_matrices(c21, c22, nsize, temp3);
+        multiply(temp3, d11, nsize, size, m2);
+
+        subtract_matrices(d12,d22,nsize,temp4);
+        multiply(c11,temp4,nsize,size,m3);
+
+        subtract_matrices(d21,d11,nsize,temp5);
+        multiply(c22,temp5,nsize,size,m4);
+
+        add_matrices(c11,c12,nsize,temp6);
+        multiply(temp6,d22,nsize,size,m5);
+
+        subtract_matrices(c21,c11,nsize,temp7);
+        add_matrices(d11,d12,nsize,temp8);
+        multiply(temp7,temp8,nsize,size,m6);
+
+        subtract_matrices(c12,c22,nsize,temp9);
+        add_matrices(d21,d22,nsize,temp10);
+        multiply(temp9,temp10,nsize,size,m7);
+
+        add_matrices(m1,m7,nsize,t1);
+        subtract_matrices(m4,m5,nsize,t2);
+        add_matrices(t1,t2,nsize,t3);    //c11
+           
+        add_matrices(m3,m5,nsize,t4);//c12   
+        add_matrices(m2,m4,nsize,t5);//c21
+       
+        add_matrices(m3,m6,nsize,t6);
+        subtract_matrices(m1,m2,nsize,t7);
+       
+        add_matrices(t6,t7,nsize,t8);//c22
+       
+        int a = 0, b = 0, c = 0, d = 0, e = 0;
+
+        int nsize2 = 2*nsize;
+
+        for(i = 0; i < nsize2; i++)
         {
-            printf("Invalid entry!\n");
-            fflush(stdin);
-            break;
+            for(j = 0; j < nsize2; j++)
+            {
+                if(j>=0 && j<nsize && i>=0 && i<nsize)
+                {
+                    new[i][j] = t3[i][j];
+                }
+                if(j>=nsize && j<nsize2 && i>=0 && i<nsize)
+                {
+                    a=j-nsize;
+                    new[i][j] = t4[i][a];
+                }
+                if(j>=0 && j<nsize && i>= nsize && i < nsize2)
+                {
+                    c=i-nsize;
+                    new[i][j] = t5[c][j];
+                }
+                if(j>=nsize && j< nsize2 && i>= nsize && i< nsize2 )
+                {
+                    d=i-nsize;
+                    e=j-nsize;
+                    new[i][j] =t8[d][e];
+                }
+            }   
         }
+
+
+    for(i = 0; i < nsize; i++)
+    {
+        free(temp1[i]);
+        free(temp2[i]);
+        free(temp3[i]);
+        free(temp4[i]);
+        free(temp5[i]);
+        free(temp6[i]);
+        free(temp7[i]);
+        free(temp8[i]);
+        free(temp9[i]);
+        free(temp10[i]);        
+        free(m1[i]);
+        free(m2[i]);
+        free(m3[i]);
+        free(m4[i]);
+        free(m5[i]);
+        free(m6[i]);
+        free(m7[i]);
+        free(t1[i]);
+        free(t2[i]);
+        free(t3[i]);
+        free(t4[i]);
+        free(t5[i]);
+        free(t6[i]);
+        free(t7[i]);
+        free(t8[i]);
+        free(c11[i]);
+        free(c12[i]);   
+        free(c21[i]);   
+        free(c22[i]);   
+        free(d11[i]);
+        free(d12[i]);   
+        free(d21[i]);   
+        free(d22[i]);
     }
 
-    }while(flag == 0);
+    free(temp1);
+    free(temp2);
+    free(temp3);
+    free(temp4);
+    free(temp5);
+    free(temp6);
+    free(temp7);
+    free(temp8);
+    free(temp9);
+    free(temp10);
+    free(m1);
+    free(m2);   
+    free(m3);   
+    free(m4);   
+    free(m5);   
+    free(m6);   
+    free(m7);   
+    free(t1);
+    free(t2);   
+    free(t3);   
+    free(t4);   
+    free(t6);   
+    free(t8);   
+    free(c11);
+    free(c12);   
+    free(c21);   
+    free(c22);   
+    free(d11);
+    free(d12);   
+    free(d21);   
+    free(d22);
 
-    return a;
+    }   
 }
 
-// Function to add two matrices
-float **add(float **a, float **b, int size, float **c)
+int main()
 {
-    int i, j;
+    int size,p,itr,itr1,i,j;
+
+    printf("Enter Size of matrix: ");   
+    scanf("%d",&size);
+
+    int tempS = size;
+
+    if(size & size-1 != 0)
+    {
+        p = log(size)/log(2);
+        size = pow(2,p+1);
+    }
+
+    int **a = malloc(size * sizeof(int *));
 
     for(i = 0; i < size; i++)
     {
-        for(j = 0; j < size; j++)
-        {
-            c[i][j] = a[i][j] + b[i][j];
+        a[i] = malloc(size*sizeof(int));
+    }   
+    int **b = malloc(size * sizeof(int *));
+    for(i=0;i<size;i++)
+    {
+        b[i] = malloc(size*sizeof(int));
+    }
+    
+    printf("Enter elements of 1st matrix\n");
+    for(itr=0;itr<size;itr++){
+    for(itr1=0;itr1<size;itr1++){
+        if(itr>=tempS || itr1>=tempS )
+            a[itr][itr1]=0;
+        else
+            scanf("%d",&a[itr][itr1]);
         }
     }
-
-    return c;
+    printf("Enter elements of 2nd matrix\n");
+    for(itr=0;itr<size;itr++){
+    for(itr1=0;itr1<size;itr1++){
+        if(itr>=tempS || itr1>=tempS)
+            a[itr][itr1]=0;
+        else
+            scanf("%d",&b[itr][itr1]);
+        }
+    }
+    int **new = malloc(size * sizeof(int *));
+    for(i=0;i<size;i++){
+        new[i] = malloc(size*sizeof(int));
+    }   
+    multiply(a,b,size,size,new);
+   
+    if(tempS<size)
+        size =tempS;
+    for(i=0;i<size;i++){
+        for(j=0;j<size;j++){
+            printf("%d   ",new[i][j]);
+        }
+        printf("\n");
+    }
 }
 
-// Function to subtract two matrices
-float **sub(float **a, float **b, int size, float **c)
+void add_matrices(int **a, int **b, int size, int **c)
 {
-    int i, j;
+    int i, j;     
+
+    for(i = 0; i < size; i++)
+    {
+        for(j = 0;j < size; j++)
+        {
+            c[i][j] = a[i][j] + b[i][j];   
+        }
+    }
+}
+
+void subtract_matrices(int **a, int **b, int size, int **c)
+{
+    int i,j;
 
     for(i = 0; i < size; i++)
     {
@@ -123,226 +339,5 @@ float **sub(float **a, float **b, int size, float **c)
         {
             c[i][j] = a[i][j] - b[i][j];
         }
-    }
-
-    return c;
-}
-
-// Function to multiply two matrices using
-// Strassen's algorithm
-void multiply(float **c, float **d, int size, int size2, float **new)
-{
-    int i, j;
-    int nsize = size / 2;
-    
-    if(size == 1)
-    {
-        new[0][0] = c[0][0] * d[0][0];
-    }
-    else
-    {
-        // Divisions of C matrix
-        float **c11 = fmatrix(nsize, nsize);
-        float **c12 = fmatrix(nsize, nsize);
-        float **c21 = fmatrix(nsize, nsize);
-        float **c22 = fmatrix(nsize, nsize);
-
-        // Divisions of D matrix
-        float **d11 = fmatrix(nsize, nsize);
-        float **d12 = fmatrix(nsize, nsize);
-        float **d21 = fmatrix(nsize, nsize);
-        float **d22 = fmatrix(nsize, nsize);
-
-        // Seven Product matrices
-        float **p1 = fmatrix(nsize, nsize);
-        float **p2 = fmatrix(nsize, nsize);
-        float **p3 = fmatrix(nsize, nsize);
-        float **p4 = fmatrix(nsize, nsize);
-        float **p5 = fmatrix(nsize, nsize);
-        float **p6 = fmatrix(nsize, nsize);
-        float **p7 = fmatrix(nsize, nsize);
-
-        // Partitioning input matrices
-        for(i = 0; i < nsize; i++)
-        {
-            for(j = 0; j < nsize; j++)
-            {
-                // Partitioning matrix C
-                c11[i][j] = c[i][j];
-                c12[i][j] = c[i][j + nsize];
-                c21[i][j] = c[i + nsize][j];
-                c22[i][j] = c[i + nsize][j + nsize];
-
-                // Partitioning matrix D
-                d11[i][j] = d[i][j];
-                d12[i][j] = d[i][j + nsize];
-                d21[i][j] = d[i + nsize][j];
-                d22[i][j] = d[i + nsize][j + nsize];
-            }            
-        }
-
-        // printf("\n");
-
-        // for(i = 0; i < nsize; i++)
-        // {
-        //     for(j = 0; j < nsize; j++)
-        //     {
-        //         printf("%f  ", d22[i][j]);
-        //     }
-        //     printf("\n");
-        // }
-
-        // Smaller multiplications
-        float **s1 = fmatrix(nsize, nsize);
-        s1 = sub(d12, d22, nsize, s1);
-        printf("nsize = %d\n", nsize);
-        for(i = 0; i < nsize; i++)
-        {
-            for(j = 0; j < nsize; j++)
-            {
-                printf("%f  ", s1[i][j]);
-            }
-            printf("\n");
-        }
-        multiply(c11, s1, nsize, size, p1);
-        free_fmatrix(s1, nsize, nsize);
-
-
-        float **s2 = fmatrix(nsize, nsize);
-        s2 = add(c11, c12, nsize, s2);
-        multiply(s2, d22, nsize, size, p2);
-        free_fmatrix(s2, nsize, nsize);
-
-        float **s3 = fmatrix(nsize, nsize);
-        s3 = add(c21, c22, nsize, s3);
-        multiply(s3, d11, nsize, size, p3);
-        free_fmatrix(s3, nsize, nsize);
-
-        float **s4 = fmatrix(nsize, nsize);
-        s4 = sub(d21, d11, nsize, s4);
-        multiply(c22, s4, nsize, size, p4);
-        free_fmatrix(s4, nsize, nsize);
-
-        float **s5 = fmatrix(nsize, nsize);
-        float **s6 = fmatrix(nsize, nsize);
-        s5 = add(c11, c22, nsize, s5);
-        s6 = add(d11, d22, nsize, s6);
-        multiply(s5, s5, nsize, size, p5);
-        free_fmatrix(s5, nsize, nsize);
-        free_fmatrix(s5, nsize, nsize);
-
-        printf("yay");
-
-        float **s7 = fmatrix(nsize, nsize);
-        float **s8 = fmatrix(nsize, nsize);
-        s7 = sub(c12, c22, nsize, s7);
-        s8 = add(d21, d22, nsize, s8);
-        multiply(s7, s8, nsize, size, p6);
-        free_fmatrix(s7, nsize, nsize);
-        free_fmatrix(s8, nsize, nsize);
-
-        float **s9 = fmatrix(nsize, nsize);
-        float **s10 = fmatrix(nsize, nsize);
-        s9 = sub(c11, c21, nsize, s9);
-        s10 = add(d11, d12, nsize, s10);
-        multiply(s9, s10, nsize, size, p7);
-        free_fmatrix(s9, nsize, nsize);
-        free_fmatrix(s10, nsize, nsize);
-
-        printf("yay1\n");
-
-        // Few temporary matrices
-        float **t1 = fmatrix(nsize, nsize);
-        printf("yay2\n");
-        float **t2 = fmatrix(nsize, nsize);
-        printf("yay3\n");
-        float **t3 = fmatrix(nsize, nsize);
-        printf("yay4\n");
-        float **t4 = fmatrix(nsize, nsize);
-        printf("yay5\n");
-        float **t5 = fmatrix(nsize, nsize);
-        printf("yay6\n");
-        float **t6 = fmatrix(nsize, nsize);
-
-        printf("yay7\n");
-
-        // Calculating final divisions of result matrices
-        t1 = add(p5, p4, nsize, t1);
-        t2 = sub(p2, p6, nsize, t2);
-        t3 = sub(t1, t2, nsize, t3); // New11
-
-        t4 = add(p1, p2, nsize, t4); // New12
-
-        t5 = add(p3, p4, nsize, t5); // New21
-
-        t1 = add(p5, p1, nsize, t1);
-        t2 = add(p3, p7, nsize, t2);
-        t6 = sub(t4, t5, nsize, t6); // New22
-
-        for(i = 0; i < size; i++)
-        {
-            for(j = 0; j < size; j++)
-            {
-                if(i >= 0 && i < nsize && j >= 0 && j < nsize)
-                {
-                    new[i][j] = t3[i][j];
-                }
-                else if(i >= 0 && i < nsize && j >= nsize && j < size)
-                {
-                    new[i][j] = t4[i][j];
-                }
-                else if(i >= nsize && i < size && j >= 0 && j < nsize)
-                {
-                    new[i][j] = t5[i][j];
-                }
-                else if(i >= nsize && i < size && j >= nsize && j < size)
-                {
-                    new[i][j] = t6[i][j];
-                }
-                printf("%d %d %f\n", i, j, new[i][j]);
-            }
-        }
-
-        free_fmatrix(p1, nsize, nsize);
-        free_fmatrix(p2, nsize, nsize);
-        free_fmatrix(p3, nsize, nsize);
-        free_fmatrix(p4, nsize, nsize);
-        free_fmatrix(p5, nsize, nsize);
-        free_fmatrix(p6, nsize, nsize);
-        free_fmatrix(p7, nsize, nsize);
-        free_fmatrix(t1, nsize, nsize);
-        free_fmatrix(t2, nsize, nsize);
-        free_fmatrix(t3, nsize, nsize);
-        free_fmatrix(t4, nsize, nsize);
-        free_fmatrix(t5, nsize, nsize);
-        free_fmatrix(t6, nsize, nsize);
-        free_fmatrix(c11, nsize, nsize);
-        free_fmatrix(c12, nsize, nsize);
-        free_fmatrix(c21, nsize, nsize);
-        free_fmatrix(c22, nsize, nsize);
-        free_fmatrix(d11, nsize, nsize);
-        free_fmatrix(d12, nsize, nsize);
-        free_fmatrix(d21, nsize, nsize);
-        free_fmatrix(d22, nsize, nsize);
-        printf("yay");
-
-    }
-}
-
-// Function to print the output
-void print_matrix(float **c, int *dimC)
-{
-    int i, j;
-    int crow = dimC[0], ccol = dimC[1];
-    
-    // Printing the matrix C
-    printf("\n\n------- MATRIX A * MATRIX B -------\n\n");
-    for(i = 0; i < crow; i++)
-    {
-        for(j = 0; j < ccol; j++)
-        {
-            printf("%0.2f\t", c[i][j]);
-        }
-        printf("\n");
     }
 }

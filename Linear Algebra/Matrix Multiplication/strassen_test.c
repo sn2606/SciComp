@@ -1,5 +1,7 @@
 // C Program to implement Strassen's algorithm for matrix multiplication
 // Divide and Conquer algorithm design paradigm
+// This code has a bug
+// Also has horrible computation time
 
 # include <stdio.h>
 # include <stdlib.h>
